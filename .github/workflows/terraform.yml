@@ -1,0 +1,56 @@
+name: Terraform VPC
+
+# Despliegue de la infraestructura mínima (1 VPC).
+# - En Pull Request: valida y muestra el plan (no aplica cambios).
+# - En push a main (manual o automático): aplica el plan.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # permite lanzarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  terraform:
+    name: Plan & Apply
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Format (check)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -no-color
+
+      # Solo aplica en push a main o lanzamiento manual, nunca en PR.
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: terraform apply -auto-approve -input=false

@@ -1,0 +1,6 @@
+# Copia este archivo a terraform.tfvars y ajusta los valores.
+# terraform.tfvars está en .gitignore: NO subir valores reales al repo.
+
+aws_region = "us-east-1"
+vpc_name   = "my-vpc-01"
+vpc_cidr   = "10.0.0.0/24"

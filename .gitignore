@@ -1,0 +1,15 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Variables con datos reales / secretos
+terraform.tfvars
+*.auto.tfvars
+
+# Credenciales
+*.pem
+.env
